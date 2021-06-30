@@ -448,8 +448,8 @@ def get_lightcurve(eventlist_fn, par=par_default, time0 = None, \
                    return_time0=False, \
                    return_pif_area=False, \
                    return_gti=False, \
-                   per_module=False,
-                   return_arrival_times=False
+                   per_module=False, \
+                   return_arrival_times=False, \
                    return_detyz=False):
 	# raw event list in extension ISGR-EVTS-ALL, pif in GNRL-EVTS-LST
 	

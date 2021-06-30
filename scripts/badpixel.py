@@ -11,7 +11,7 @@ def show_det(det):
 	plt.ylabel("det z")
 	plt.colorbar(im, orientation="horizontal", pad=0.15)
 	
-def det_stats(H, pifmask, pif_th, show_plots=True):
+def det_stats(H, pifmask, pif_th, show_plots=True, verbose=True):
 	n_photons = np.sum(H.ravel())
 	i = pifmask >= pif_th 
 	p = H[i].ravel() # pixels above pif threshold
@@ -26,8 +26,9 @@ def det_stats(H, pifmask, pif_th, show_plots=True):
 	npx_pif = np.count_nonzero(i)
 	expected = n_photons//npx_pif + 1
 	std = np.sqrt(np.sum( (c - expected)**2)/len(c))
-	print("{0:g} photons on {1:g} of {2:g} illuminated pixels".format(n_photons, pnz, npx_pif))
-	print("Expected {0:g} photon(s) on pixel\nMean {1:g}\nMax count in pixel {2:g}\nstd {3:g}".format(expected, np.mean(c), np.max(c), std))
+	if verbose:
+		print("{0:g} photons on {1:g} of {2:g} illuminated pixels".format(n_photons, pnz, npx_pif))
+		print("Expected {0:g} photon(s) on pixel\nMean {1:g}\nMax count in pixel {2:g}\nstd {3:g}".format(expected, np.mean(c), np.max(c), std))
 	
 	badpx_th = expected + 3.*np.sqrt(expected)
 	badpx_list = H > badpx_th
@@ -35,8 +36,7 @@ def det_stats(H, pifmask, pif_th, show_plots=True):
 
 def badpixels0(lc, pifmask, pif_th, flare_start_ijd, duration, boundary = 0.01/(24*60*60)):
 	time =  lc.arrival_times
-	filtr = (time >= flare_start_ijd - boundary) & \
-			(time <= flare_end_ijd + boundary) & \	
+	filtr = (time >= flare_start_ijd - boundary) & (time <= flare_end_ijd + boundary)
 	dety_target = lc.dety[filtr]
 	detz_target = lc.detz[filtr]
 	H, xedges, yedges = np.histogram2d(detz_target, dety_target, bins=pifmask.shape, range=[[0,133],[0,129]])	
@@ -52,7 +52,7 @@ def badpixels0(lc, pifmask, pif_th, flare_start_ijd, duration, boundary = 0.01/(
 	badpx_list = H > badpx_th
 	return std
 
-def badpixels(fn, fn_pif, flare_start_ijd, duration, pif_th=0.5, low_e=20, high_e=150, mode="pif", show_plots=True, boundary = 0.01/(24*60*60)):
+def badpixels(fn, fn_pif, flare_start_ijd, duration, pif_th=0.5, low_e=20, high_e=150, mode="pif", show_plots=True, boundary = 0.01/(24*60*60), verbose=True):
 	
 	flare_end_ijd =  flare_start_ijd + duration/(24*60*60)
 	
@@ -116,7 +116,7 @@ def badpixels(fn, fn_pif, flare_start_ijd, duration, pif_th=0.5, low_e=20, high_
 		plt.ylabel("det z")
 		plt.title("pif mask (> {0})".format(pif_th))
 		plt.show()
-	n_photons, nz, npx_pif, expected, c, std, badpx_list = det_stats(H, pifmask, pif_th, show_plots=show_plots)
+	n_photons, nz, npx_pif, expected, c, std, badpx_list = det_stats(H, pifmask, pif_th, show_plots=show_plots, verbose=verbose)
 	return n_photons, nz, npx_pif, expected, np.max(c), std, badpx_list 
 
 
