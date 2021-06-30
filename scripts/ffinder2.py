@@ -50,15 +50,15 @@ def scan_1scw_for_flares(fn, par=par_default, flares=None, verbose=True, check_b
 			print("Scw {0} shorter than {1} bins. Skipping...".format(scw, SCW_MIN_LENTGH))
 		return flares
 	n_gti = np.count_nonzero(gti)
-	r_ = r.copy()
+	#r_ = r.copy()
 	if n_gti > 0:
 		mu, std = sigma_clipping(r[gti])
-		r_[~gti] = mu
+	#	r_[~gti] = mu
 	else:
 		mu, std = sigma_clipping(r)
 		
 	n_flares_found = 0
-	above_across = find_peaks(r_, mu, n_binnings=par['n_binnings'], prob_th=par['prob_th'])
+	above_across = find_peaks(r, mu, n_binnings=par['n_binnings'], prob_th=par['prob_th'])
 	
 	if np.any(above_across == True):
 		pulses = continuous_regions(above_across)
